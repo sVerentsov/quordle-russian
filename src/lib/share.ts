@@ -10,20 +10,18 @@ const browser = parser.getBrowser()
 const device = parser.getDevice()
 
 export const shareStatus = (
-  solution: string,
+  solutions: string[],
   guesses: string[],
   lost: boolean,
-  isHardMode: boolean,
   isDarkMode: boolean,
   isHighContrastMode: boolean,
   handleShareToClipboard: () => void
 ) => {
   const textToShare =
-    `${GAME_TITLE} ${solutionIndex} ${
-      lost ? 'X' : guesses.length
-    }/${MAX_CHALLENGES}${isHardMode ? '*' : ''}\n\n` +
+    `${GAME_TITLE} ${solutionIndex} ${lost ? 'X' : guesses.length
+    }/${MAX_CHALLENGES}\n\n` +
     generateEmojiGrid(
-      solution,
+      solutions,
       guesses,
       getEmojiTiles(isDarkMode, isHighContrastMode)
     )
@@ -47,30 +45,42 @@ export const shareStatus = (
   }
 }
 
+const generateEmojiLine = (solution: string, guess: string, tiles: string[]): string => {
+  const status = getGuessStatuses(solution, guess)
+  const splitGuess = unicodeSplit(guess)
+
+  return splitGuess
+    .map((_, i) => {
+      switch (status[i]) {
+        case 'correct':
+          return tiles[0]
+        case 'present':
+          return tiles[1]
+        default:
+          return tiles[2]
+      }
+    })
+    .join('')
+}
+
 export const generateEmojiGrid = (
-  solution: string,
+  solutions: string[],
   guesses: string[],
   tiles: string[]
 ) => {
-  return guesses
-    .map((guess) => {
-      const status = getGuessStatuses(solution, guess)
-      const splitGuess = unicodeSplit(guess)
-
-      return splitGuess
-        .map((_, i) => {
-          switch (status[i]) {
-            case 'correct':
-              return tiles[0]
-            case 'present':
-              return tiles[1]
-            default:
-              return tiles[2]
-          }
-        })
-        .join('')
-    })
+  const row1 = guesses
+    .map((guess) =>
+      generateEmojiLine(solutions[0], guess, tiles) + ' ' +
+      generateEmojiLine(solutions[1], guess, tiles)
+    )
     .join('\n')
+  const row2 = guesses
+    .map((guess) =>
+      generateEmojiLine(solutions[2], guess, tiles) + ' ' +
+      generateEmojiLine(solutions[3], guess, tiles)
+    )
+    .join('\n')
+  return [row1, row2].join('\n\n')
 }
 
 const attemptShare = (shareData: object) => {

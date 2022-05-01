@@ -24,21 +24,29 @@ export const Grid = ({
       : []
 
   return (
-    <>
+    <div
+      className="pb-2 h-1/2 grid gap-y-px"
+      style={{
+        gridTemplateRows:
+          (guesses.length ? `repeat(${guesses.length}, auto) ` : '') +
+          '3rem' +
+          (empties.length ? ` repeat(${empties.length}, auto)` : ''),
+      }}
+    >
       {guesses.map((guess, i) => (
-        <CompletedRow
-          key={i}
-          solution={solution}
-          guess={guess}
-          isRevealing={isRevealing && guesses.length - 1 === i}
-        />
+        <CompletedRow key={i} solution={solution} guess={guess} />
       ))}
       {guesses.length < MAX_CHALLENGES && (
-        <CurrentRow guess={currentGuess} className={currentRowClassName} />
+        <CurrentRow
+          solution={solution}
+          guess={currentGuess}
+          className={currentRowClassName}
+          isRevealing={isRevealing}
+        />
       )}
       {empties.map((_, i) => (
         <EmptyRow key={i} />
       ))}
-    </>
+    </div>
   )
 }

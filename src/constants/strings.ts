@@ -1,29 +1,25 @@
-export const GAME_TITLE = process.env.REACT_APP_GAME_NAME!
+export const GAME_TITLE = 'Quordle RU'
 
-export const WIN_MESSAGES = ['Great Job!', 'Awesome', 'Well done!']
-export const GAME_COPIED_MESSAGE = 'Game copied to clipboard'
-export const NOT_ENOUGH_LETTERS_MESSAGE = 'Not enough letters'
-export const WORD_NOT_FOUND_MESSAGE = 'Word not found'
-export const HARD_MODE_ALERT_MESSAGE =
-  'Hard Mode can only be enabled at the start!'
-export const HARD_MODE_DESCRIPTION =
-  'Any revealed hints must be used in subsequent guesses'
-export const HIGH_CONTRAST_MODE_DESCRIPTION = 'For improved color vision'
-export const CORRECT_WORD_MESSAGE = (solution: string) =>
-  `The word was ${solution}`
+export const WIN_MESSAGES = ['Отлично!', 'Хорошая работа', 'Неплохо!']
+export const GAME_COPIED_MESSAGE = 'Скопировано в буфер обмена'
+export const NOT_ENOUGH_LETTERS_MESSAGE = 'Недостаточно букв'
+export const WORD_NOT_FOUND_MESSAGE = 'Этого слова нет в словаре'
+export const HIGH_CONTRAST_MODE_DESCRIPTION = 'Для лучшего распознавания цветов'
+export const CORRECT_WORD_MESSAGE = (solutions: string[]) =>
+  `Правильные слова – ${solutions.join(', ')}`
 export const WRONG_SPOT_MESSAGE = (guess: string, position: number) =>
-  `Must use ${guess} in position ${position}`
+  `Нужно использовать ${guess} на позиции ${position}`
 export const NOT_CONTAINED_MESSAGE = (letter: string) =>
-  `Guess must contain ${letter}`
+  `В слове должна быть буква ${letter}`
 export const ENTER_TEXT = 'Enter'
-export const DELETE_TEXT = 'Delete'
-export const STATISTICS_TITLE = 'Statistics'
-export const GUESS_DISTRIBUTION_TEXT = 'Guess Distribution'
-export const NEW_WORD_TEXT = 'New word in'
-export const SHARE_TEXT = 'Share'
-export const TOTAL_TRIES_TEXT = 'Total tries'
-export const SUCCESS_RATE_TEXT = 'Success rate'
-export const CURRENT_STREAK_TEXT = 'Current streak'
-export const BEST_STREAK_TEXT = 'Best streak'
+export const DELETE_TEXT = 'Удалить'
+export const STATISTICS_TITLE = 'Статистика'
+export const GUESS_DISTRIBUTION_TEXT = 'Распределение попыток'
+export const NEW_WORD_TEXT = 'Следующее слово через'
+export const SHARE_TEXT = 'Поделиться'
+export const TOTAL_TRIES_TEXT = 'Всего попыток'
+export const SUCCESS_RATE_TEXT = 'Процент успехов'
+export const CURRENT_STREAK_TEXT = 'Текущее комбо'
+export const BEST_STREAK_TEXT = 'Лучшее комбо'
 export const DISCOURAGE_INAPP_BROWSER_TEXT =
   "You are using an embedded browser and may experience problems sharing or saving your results. We encourage you rather to use your device's default browser."

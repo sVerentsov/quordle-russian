@@ -6,7 +6,8 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+
+runs-on: ubuntu-latest
 
 env:
   SSH_KEY: ${{secrets.SSH_KEY}}
@@ -24,6 +25,6 @@ steps:
   - run: mkdir ~/.ssh
   - run: 'echo "$SSH_KEY" >> ~/.ssh/github-action'
   - run: chmod 400 ~/.ssh/github-action
-  - run: echo -e "Host static\n\tUser github-actions\n\tHostname ${{secrets.SSH_KEY}}\n\tPort ${{secrets.SSH_PORT}}\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
+  - run: echo -e "Host static\n\tUser github-actions\n\tHostname ${{secrets.SSH_HOST}}\n\tPort ${{secrets.SSH_PORT}}\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
 
   - run: rsync -e ssh build static:~/static/quordle

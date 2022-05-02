@@ -46,20 +46,9 @@ export const getWordsOfDay = (count: number) => {
   nextDay.setDate(today.getDate() + 1)
 
   const rand = seedrandom(index.toString())
-  const results: Array<number> = []
-
-  while (results.length < count) {
-    while (true) {
-      const ind = Math.floor(rand() * (WORDS.length + 1))
-      if (!results.includes(ind)) {
-        results.push(ind)
-        break
-      }
-    }
-  }
-
+  const inds = getWordsIndexes(rand, count)
   return {
-    solutions: results.map((ind) =>
+    solutions: inds.map((ind) =>
       localeAwareUpperCase(WORDS[ind % WORDS.length])
     ),
     solutionIndex: index,
@@ -67,4 +56,21 @@ export const getWordsOfDay = (count: number) => {
   }
 }
 
-export const { solutions, solutionIndex, tomorrow } = getWordsOfDay(4)
+const getWordsIndexes = (randFunc: () => number, count: number): number[] => {
+  const results: number[] = []
+  while (results.length < count) {
+    while (true) {
+      const ind = Math.floor(randFunc() * (WORDS.length + 1))
+      if (!results.includes(ind)) {
+        results.push(ind)
+        break
+      }
+    }
+  }
+  return results
+}
+
+export const getWords = (count: number): string[] => {
+  const inds = getWordsIndexes(Math.random, count)
+  return inds.map((ind) => localeAwareUpperCase(WORDS[ind % WORDS.length]))
+}

@@ -1,14 +1,14 @@
 import { getStatuses } from '../../lib/statuses'
 import { Key } from './Key'
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { ENTER_TEXT, DELETE_TEXT } from '../../constants/strings'
 import { localeAwareUpperCase } from '../../lib/words'
+import { SolutionContext } from '../../context/SolutionsContext'
 
 type Props = {
   onChar: (value: string) => void
   onDelete: () => void
   onEnter: () => void
-  solutions: string[]
   guesses: string[]
   isRevealing?: boolean
 }
@@ -17,10 +17,10 @@ export const Keyboard = ({
   onChar,
   onDelete,
   onEnter,
-  solutions,
   guesses,
   isRevealing,
 }: Props) => {
+  const { solutions } = useContext(SolutionContext)
   const charStatuses = getStatuses(solutions, guesses)
 
   const onClick = (value: string) => {

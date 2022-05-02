@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Grid } from './components/grid/Grid'
 import { Keyboard } from './components/keyboard/Keyboard'
 import { InfoModal } from './components/modals/InfoModal'
@@ -11,6 +11,7 @@ import {
   WORD_NOT_FOUND_MESSAGE,
   CORRECT_WORD_MESSAGE,
   DISCOURAGE_INAPP_BROWSER_TEXT,
+  CHANGED_MODE_TEXT,
 } from './constants/strings'
 import {
   MAX_CHALLENGES,
@@ -19,7 +20,12 @@ import {
   DISCOURAGE_INAPP_BROWSERS,
   CHAR_COUNT,
 } from './constants/settings'
-import { isWordInWordList, solutions, unicodeLength } from './lib/words'
+import {
+  getWords,
+  getWordsOfDay,
+  isWordInWordList,
+  unicodeLength,
+} from './lib/words'
 import { addStatsForCompletedGame, loadStats } from './lib/stats'
 import {
   loadGameStateFromLocalStorage,
@@ -34,6 +40,8 @@ import { AlertContainer } from './components/alerts/AlertContainer'
 import { useAlert } from './context/AlertContext'
 import { Navbar } from './components/navbar/Navbar'
 import { isInAppBrowser } from './lib/browser'
+import { GameMode } from './lib/modes'
+import { SolutionContext } from './context/SolutionsContext'
 
 function App() {
   const prefersDarkMode = window.matchMedia(
@@ -42,6 +50,8 @@ function App() {
 
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert()
+  const [solutions, setSolutions] = useState(() => getWordsOfDay(4).solutions)
+  const [dailySolutionsData] = useState(() => getWordsOfDay(4))
   const [currentGuess, setCurrentGuess] = useState('')
   const [isGameWon, setIsGameWon] = useState(false)
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false)
@@ -59,16 +69,19 @@ function App() {
   const [isHighContrastMode, setIsHighContrastMode] = useState(
     getStoredIsHighContrastMode()
   )
+  const [mode, setMode] = useState<GameMode>('daily')
   const [isRevealing, setIsRevealing] = useState(false)
-  const [guesses, setGuesses] = useState<string[]>(() => {
+
+  const processSavedGuesses = useCallback(() => {
     const loaded = loadGameStateFromLocalStorage()
     if (!loaded) {
       return []
     }
-    if (loaded?.solutions.some((val, i) => solutions[i] !== val)) {
+    const dailySolutions = getWordsOfDay(4).solutions
+    if (loaded?.solutions.some((val, i) => dailySolutions[i] !== val)) {
       return []
     }
-    const gameWasWon = solutions.every((solution) =>
+    const gameWasWon = dailySolutions.every((solution) =>
       loaded.guesses.includes(solution)
     )
     if (gameWasWon) {
@@ -76,12 +89,14 @@ function App() {
     }
     if (loaded.guesses.length === MAX_CHALLENGES && !gameWasWon) {
       setIsGameLost(true)
-      showErrorAlert(CORRECT_WORD_MESSAGE(solutions), {
+      showErrorAlert(CORRECT_WORD_MESSAGE(dailySolutions), {
         persist: true,
       })
     }
     return loaded.guesses
-  })
+  }, [showErrorAlert])
+
+  const [guesses, setGuesses] = useState<string[]>(() => processSavedGuesses())
 
   const [stats, setStats] = useState(() => loadStats())
 
@@ -103,6 +118,25 @@ function App() {
         durationMs: 7000,
       })
   }, [showErrorAlert])
+
+  const resetPracticeGame = () => {
+    setSolutions(getWords(4))
+    setGuesses([])
+    setCurrentGuess('')
+    setIsGameWon(false)
+    setIsGameLost(false)
+  }
+
+  useEffect(() => {
+    showSuccessAlert(CHANGED_MODE_TEXT[mode])
+    if (mode === 'practice') {
+      resetPracticeGame()
+    } else {
+      setSolutions(getWordsOfDay(4).solutions)
+      setGuesses(processSavedGuesses())
+      setCurrentGuess('')
+    }
+  }, [mode, showSuccessAlert, processSavedGuesses])
 
   useEffect(() => {
     if (isDarkMode) {
@@ -133,7 +167,10 @@ function App() {
   }
 
   useEffect(() => {
-    saveGameStateToLocalStorage({ guesses, solutions })
+    if (mode === 'daily') {
+      saveGameStateToLocalStorage({ guesses, solutions })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guesses])
 
   useEffect(() => {
@@ -222,61 +259,68 @@ function App() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <Navbar
-        setIsInfoModalOpen={setIsInfoModalOpen}
-        setIsStatsModalOpen={setIsStatsModalOpen}
-        setIsSettingsModalOpen={setIsSettingsModalOpen}
-      />
-      <div className="pt-1 px-1 pb-1 w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow max-w-[550px] h-screen">
-        <div className="columns-2 h-full">
-          {solutions.map((solution, i) => (
-            <Grid
-              solution={solution}
-              key={i}
-              guesses={guesses}
-              currentGuess={currentGuess}
-              isRevealing={isRevealing}
-              currentRowClassName={currentRowClass}
-            />
-          ))}
+    <SolutionContext.Provider value={{ ...dailySolutionsData, solutions }}>
+      <div className="h-screen flex flex-col">
+        <Navbar
+          setIsInfoModalOpen={setIsInfoModalOpen}
+          setIsStatsModalOpen={setIsStatsModalOpen}
+          setIsSettingsModalOpen={setIsSettingsModalOpen}
+          gameMode={mode}
+          onModeChange={(mode) => setMode(mode)}
+        />
+        <div className="pt-1 px-1 pb-1 w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow max-w-[550px] h-screen">
+          <div className="columns-2 h-full">
+            {solutions.map((solution, i) => (
+              <Grid
+                solution={solution}
+                key={i}
+                guesses={guesses}
+                currentGuess={currentGuess}
+                isRevealing={isRevealing}
+                currentRowClassName={currentRowClass}
+              />
+            ))}
+          </div>
+          <Keyboard
+            onChar={onChar}
+            onDelete={onDelete}
+            onEnter={onEnter}
+            guesses={guesses}
+            isRevealing={isRevealing}
+          />
+          <InfoModal
+            isOpen={isInfoModalOpen}
+            handleClose={() => setIsInfoModalOpen(false)}
+          />
+          <StatsModal
+            isOpen={isStatsModalOpen}
+            handleClose={() => setIsStatsModalOpen(false)}
+            guesses={guesses}
+            gameStats={stats}
+            isGameLost={isGameLost}
+            isGameWon={isGameWon}
+            handleShareToClipboard={() => showSuccessAlert(GAME_COPIED_MESSAGE)}
+            isDarkMode={isDarkMode}
+            isHighContrastMode={isHighContrastMode}
+            mode={mode}
+            onNewGameClick={() => {
+              resetPracticeGame()
+              setIsStatsModalOpen(false)
+            }}
+            numberOfGuessesMade={guesses.length}
+          />
+          <SettingsModal
+            isOpen={isSettingsModalOpen}
+            handleClose={() => setIsSettingsModalOpen(false)}
+            isDarkMode={isDarkMode}
+            handleDarkMode={handleDarkMode}
+            isHighContrastMode={isHighContrastMode}
+            handleHighContrastMode={handleHighContrastMode}
+          />
+          <AlertContainer />
         </div>
-        <Keyboard
-          onChar={onChar}
-          onDelete={onDelete}
-          onEnter={onEnter}
-          solutions={solutions}
-          guesses={guesses}
-          isRevealing={isRevealing}
-        />
-        <InfoModal
-          isOpen={isInfoModalOpen}
-          handleClose={() => setIsInfoModalOpen(false)}
-        />
-        <StatsModal
-          isOpen={isStatsModalOpen}
-          handleClose={() => setIsStatsModalOpen(false)}
-          solutions={solutions}
-          guesses={guesses}
-          gameStats={stats}
-          isGameLost={isGameLost}
-          isGameWon={isGameWon}
-          handleShareToClipboard={() => showSuccessAlert(GAME_COPIED_MESSAGE)}
-          isDarkMode={isDarkMode}
-          isHighContrastMode={isHighContrastMode}
-          numberOfGuessesMade={guesses.length}
-        />
-        <SettingsModal
-          isOpen={isSettingsModalOpen}
-          handleClose={() => setIsSettingsModalOpen(false)}
-          isDarkMode={isDarkMode}
-          handleDarkMode={handleDarkMode}
-          isHighContrastMode={isHighContrastMode}
-          handleHighContrastMode={handleHighContrastMode}
-        />
-        <AlertContainer />
       </div>
-    </div>
+    </SolutionContext.Provider>
   )
 }
 

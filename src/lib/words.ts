@@ -1,7 +1,7 @@
 import { WORDS } from '../constants/wordlist'
 import { VALID_GUESSES } from '../constants/validGuesses'
 import { default as GraphemeSplitter } from 'grapheme-splitter'
-import { default as seedrandom } from 'seedrandom';
+import { default as seedrandom } from 'seedrandom'
 
 export const isWordInWordList = (word: string) => {
   return (
@@ -45,21 +45,23 @@ export const getWordsOfDay = (count: number) => {
   const nextDay = new Date(today)
   nextDay.setDate(today.getDate() + 1)
 
-  const rand = seedrandom(index.toString());
-  const results: Array<number> = [];
+  const rand = seedrandom(index.toString())
+  const results: Array<number> = []
 
   while (results.length < count) {
     while (true) {
-      const ind = Math.floor(rand() * (WORDS.length + 1));
+      const ind = Math.floor(rand() * (WORDS.length + 1))
       if (!results.includes(ind)) {
-        results.push(ind);
-        break;
+        results.push(ind)
+        break
       }
     }
   }
 
   return {
-    solutions: results.map((ind) => localeAwareUpperCase(WORDS[ind % WORDS.length])),
+    solutions: results.map((ind) =>
+      localeAwareUpperCase(WORDS[ind % WORDS.length])
+    ),
     solutionIndex: index,
     tomorrow: nextDay.valueOf(),
   }

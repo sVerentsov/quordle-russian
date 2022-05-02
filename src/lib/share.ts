@@ -18,7 +18,8 @@ export const shareStatus = (
   handleShareToClipboard: () => void
 ) => {
   const textToShare =
-    `${GAME_TITLE} ${solutionIndex} ${lost ? 'X' : guesses.length
+    `${GAME_TITLE} ${solutionIndex} ${
+      lost ? 'X' : guesses.length
     }/${MAX_CHALLENGES}\n\n` +
     generateEmojiGrid(
       solutions,
@@ -45,7 +46,11 @@ export const shareStatus = (
   }
 }
 
-const generateEmojiLine = (solution: string, guess: string, tiles: string[]): string => {
+const generateEmojiLine = (
+  solution: string,
+  guess: string,
+  tiles: string[]
+): string => {
   const status = getGuessStatuses(solution, guess)
   const splitGuess = unicodeSplit(guess)
 
@@ -69,15 +74,19 @@ export const generateEmojiGrid = (
   tiles: string[]
 ) => {
   const row1 = guesses
-    .map((guess) =>
-      generateEmojiLine(solutions[0], guess, tiles) + ' ' +
-      generateEmojiLine(solutions[1], guess, tiles)
+    .map(
+      (guess) =>
+        generateEmojiLine(solutions[0], guess, tiles) +
+        ' ' +
+        generateEmojiLine(solutions[1], guess, tiles)
     )
     .join('\n')
   const row2 = guesses
-    .map((guess) =>
-      generateEmojiLine(solutions[2], guess, tiles) + ' ' +
-      generateEmojiLine(solutions[3], guess, tiles)
+    .map(
+      (guess) =>
+        generateEmojiLine(solutions[2], guess, tiles) +
+        ' ' +
+        generateEmojiLine(solutions[3], guess, tiles)
     )
     .join('\n')
   return [row1, row2].join('\n\n')

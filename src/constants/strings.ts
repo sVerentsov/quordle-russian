@@ -30,3 +30,4 @@ export const CHANGED_MODE_TEXT: Record<GameMode, string> = {
   practice: 'Бесконечный режим',
 }
 export const NEW_GAME_TEXT = 'Новая игра'
+export const HOME_LINK = 'verentsov.space/quordle'

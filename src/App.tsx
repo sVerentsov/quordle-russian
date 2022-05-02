@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Grid } from './components/grid/Grid'
 import { Keyboard } from './components/keyboard/Keyboard'
 import { InfoModal } from './components/modals/InfoModal'
@@ -21,7 +21,7 @@ import {
   CHAR_COUNT,
 } from './constants/settings'
 import {
-  getWords,
+  getPracticeWords,
   getWordsOfDay,
   isWordInWordList,
   unicodeLength,
@@ -32,6 +32,8 @@ import {
   saveGameStateToLocalStorage,
   setStoredIsHighContrastMode,
   getStoredIsHighContrastMode,
+  loadShowHelpFromLocalStorage,
+  saveShowHelpToLocalStorage,
 } from './lib/localStorage'
 import { default as GraphemeSplitter } from 'grapheme-splitter'
 
@@ -47,10 +49,14 @@ function App() {
   const prefersDarkMode = window.matchMedia(
     '(prefers-color-scheme: dark)'
   ).matches
-
+  const hash = Number(window.location.hash.substring(1))
+  const { solutions: defaultSolutions, solutionIndex: defaultSolutionIndex } =
+    hash ? getPracticeWords({ count: 4, seed: hash }) : getWordsOfDay(4)
+  const firstRender = useRef(true)
   const { showError: showErrorAlert, showSuccess: showSuccessAlert } =
     useAlert()
-  const [solutions, setSolutions] = useState(() => getWordsOfDay(4).solutions)
+  const [solutions, setSolutions] = useState(defaultSolutions)
+  const [solutionIndex, setSolutionIndex] = useState(defaultSolutionIndex)
   const [dailySolutionsData] = useState(() => getWordsOfDay(4))
   const [currentGuess, setCurrentGuess] = useState('')
   const [isGameWon, setIsGameWon] = useState(false)
@@ -69,7 +75,7 @@ function App() {
   const [isHighContrastMode, setIsHighContrastMode] = useState(
     getStoredIsHighContrastMode()
   )
-  const [mode, setMode] = useState<GameMode>('daily')
+  const [mode, setMode] = useState<GameMode>(hash ? 'practice' : 'daily')
   const [isRevealing, setIsRevealing] = useState(false)
 
   const processSavedGuesses = useCallback(() => {
@@ -81,9 +87,9 @@ function App() {
     if (loaded?.solutions.some((val, i) => dailySolutions[i] !== val)) {
       return []
     }
-    const gameWasWon = dailySolutions.every((solution) =>
-      loaded.guesses.includes(solution)
-    )
+    const gameWasWon =
+      mode === 'daily' &&
+      dailySolutions.every((solution) => loaded.guesses.includes(solution))
     if (gameWasWon) {
       setIsGameWon(true)
     }
@@ -103,7 +109,7 @@ function App() {
   useEffect(() => {
     // if no game state on load,
     // show the user the how-to info modal
-    if (!loadGameStateFromLocalStorage()) {
+    if (loadShowHelpFromLocalStorage()) {
       setTimeout(() => {
         setIsInfoModalOpen(true)
       }, WELCOME_INFO_MODAL_MS)
@@ -120,7 +126,9 @@ function App() {
   }, [showErrorAlert])
 
   const resetPracticeGame = () => {
-    setSolutions(getWords(4))
+    const { solutions, solutionIndex } = getPracticeWords({ count: 4 })
+    setSolutions(solutions)
+    setSolutionIndex(solutionIndex)
     setGuesses([])
     setCurrentGuess('')
     setIsGameWon(false)
@@ -128,11 +136,17 @@ function App() {
   }
 
   useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false
+      return
+    }
     showSuccessAlert(CHANGED_MODE_TEXT[mode])
     if (mode === 'practice') {
       resetPracticeGame()
     } else {
-      setSolutions(getWordsOfDay(4).solutions)
+      const { solutions, solutionIndex } = getWordsOfDay(4)
+      setSolutions(solutions)
+      setSolutionIndex(solutionIndex)
       setGuesses(processSavedGuesses())
       setCurrentGuess('')
     }
@@ -259,7 +273,9 @@ function App() {
   }
 
   return (
-    <SolutionContext.Provider value={{ ...dailySolutionsData, solutions }}>
+    <SolutionContext.Provider
+      value={{ ...dailySolutionsData, solutions, solutionIndex }}
+    >
       <div className="h-screen flex flex-col">
         <Navbar
           setIsInfoModalOpen={setIsInfoModalOpen}
@@ -290,7 +306,10 @@ function App() {
           />
           <InfoModal
             isOpen={isInfoModalOpen}
-            handleClose={() => setIsInfoModalOpen(false)}
+            handleClose={() => {
+              setIsInfoModalOpen(false)
+              saveShowHelpToLocalStorage()
+            }}
           />
           <StatsModal
             isOpen={isStatsModalOpen}

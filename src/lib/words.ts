@@ -70,7 +70,18 @@ const getWordsIndexes = (randFunc: () => number, count: number): number[] => {
   return results
 }
 
-export const getWords = (count: number): string[] => {
-  const inds = getWordsIndexes(Math.random, count)
-  return inds.map((ind) => localeAwareUpperCase(WORDS[ind % WORDS.length]))
+type PracticeWordsArgs = { count: number; seed?: number }
+
+export const getPracticeWords = ({ count, seed }: PracticeWordsArgs) => {
+  if (seed === undefined) {
+    seed = Math.floor(Math.random() * 10000)
+  }
+  const rand = seedrandom(seed.toString())
+  const inds = getWordsIndexes(rand, count)
+  return {
+    solutions: inds.map((ind) =>
+      localeAwareUpperCase(WORDS[ind % WORDS.length])
+    ),
+    solutionIndex: seed,
+  }
 }

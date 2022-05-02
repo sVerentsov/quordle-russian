@@ -1,5 +1,6 @@
 const gameStateKey = 'gameState'
 const highContrastKey = 'highContrast'
+const showHelp = 'gameShowHelp'
 
 type StoredGameState = {
   guesses: string[]
@@ -14,6 +15,13 @@ export const loadGameStateFromLocalStorage = () => {
   const state = localStorage.getItem(gameStateKey)
   return state ? (JSON.parse(state) as StoredGameState) : null
 }
+
+export const saveShowHelpToLocalStorage = () => {
+  localStorage.setItem(showHelp, '1')
+}
+
+export const loadShowHelpFromLocalStorage = () =>
+  !localStorage.getItem(showHelp)
 
 const gameStatKey = 'gameStats'
 

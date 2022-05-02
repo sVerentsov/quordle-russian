@@ -103,7 +103,8 @@ export const StatsModal = ({
                 isDarkMode,
                 isHighContrastMode,
                 solutionIndex,
-                handleShareToClipboard
+                handleShareToClipboard,
+                mode
               )
             }}
           >

@@ -3,6 +3,7 @@ import { unicodeSplit } from './words'
 import { GAME_TITLE, HOME_LINK } from '../constants/strings'
 import { MAX_CHALLENGES } from '../constants/settings'
 import { UAParser } from 'ua-parser-js'
+import { GameMode } from './modes'
 
 const webShareApiDeviceTypes: string[] = ['mobile', 'smarttv', 'wearable']
 const parser = new UAParser()
@@ -16,12 +17,15 @@ export const shareStatus = (
   isDarkMode: boolean,
   isHighContrastMode: boolean,
   solutionIndex: number,
-  handleShareToClipboard: () => void
+  handleShareToClipboard: () => void,
+  mode: GameMode
 ) => {
   const textToShare =
     `${GAME_TITLE} ${solutionIndex} ${
       lost ? 'X' : guesses.length
-    }/${MAX_CHALLENGES}\n\n${HOME_LINK}\n\n` +
+    }/${MAX_CHALLENGES}\n\n${HOME_LINK}${
+      mode === 'practice' ? '#' + solutionIndex : ''
+    }\n\n` +
     generateEmojiGrid(
       solutions,
       guesses,

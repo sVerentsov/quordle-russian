@@ -8,6 +8,7 @@ type Props = {
   className: string
   solution: string
   isRevealing?: boolean
+  hidden?: boolean
 }
 
 export const CurrentRow = ({
@@ -15,10 +16,13 @@ export const CurrentRow = ({
   guess,
   className,
   isRevealing,
+  hidden,
 }: Props) => {
   const splitGuess = unicodeSplit(guess)
   const emptyCells = Array.from(Array(CHAR_COUNT - splitGuess.length))
-  const classes = `flex justify-center text-3xl ${className}`
+  const classes = `flex justify-center text-3xl ${
+    hidden ? 'hidden' : ''
+  } ${className}`
   const statuses =
     guess.length === CHAR_COUNT && isRevealing
       ? getGuessStatuses(solution, guess)

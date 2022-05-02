@@ -12,7 +12,7 @@ export const getStatuses = (
       solutions.forEach((sol, i) => {
         const splitSolution = unicodeSplit(sol)
         if (charObj[letter] === undefined) {
-          charObj[letter] = [];
+          charObj[letter] = []
         }
         if (!splitSolution.includes(letter)) {
           // make status absent

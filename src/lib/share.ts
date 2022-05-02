@@ -1,5 +1,5 @@
 import { getGuessStatuses } from './statuses'
-import { solutionIndex, unicodeSplit } from './words'
+import { unicodeSplit } from './words'
 import { GAME_TITLE } from '../constants/strings'
 import { MAX_CHALLENGES } from '../constants/settings'
 import { UAParser } from 'ua-parser-js'
@@ -15,6 +15,7 @@ export const shareStatus = (
   lost: boolean,
   isDarkMode: boolean,
   isHighContrastMode: boolean,
+  solutionIndex: number,
   handleShareToClipboard: () => void
 ) => {
   const textToShare =

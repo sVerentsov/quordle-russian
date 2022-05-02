@@ -1,3 +1,5 @@
+import { GameMode } from '../lib/modes'
+
 export const GAME_TITLE = 'Quordle RU'
 
 export const WIN_MESSAGES = ['Отлично!', 'Хорошая работа', 'Неплохо!']
@@ -23,3 +25,8 @@ export const CURRENT_STREAK_TEXT = 'Текущее комбо'
 export const BEST_STREAK_TEXT = 'Лучшее комбо'
 export const DISCOURAGE_INAPP_BROWSER_TEXT =
   "You are using an embedded browser and may experience problems sharing or saving your results. We encourage you rather to use your device's default browser."
+export const CHANGED_MODE_TEXT: Record<GameMode, string> = {
+  daily: 'Слово дня',
+  practice: 'Бесконечный режим',
+}
+export const NEW_GAME_TEXT = 'Новая игра'

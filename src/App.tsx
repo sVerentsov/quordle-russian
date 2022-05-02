@@ -87,9 +87,9 @@ function App() {
     if (loaded?.solutions.some((val, i) => dailySolutions[i] !== val)) {
       return []
     }
-    const gameWasWon =
-      mode === 'daily' &&
-      dailySolutions.every((solution) => loaded.guesses.includes(solution))
+    const gameWasWon = dailySolutions.every((solution) =>
+      loaded.guesses.includes(solution)
+    )
     if (gameWasWon) {
       setIsGameWon(true)
     }
@@ -100,10 +100,11 @@ function App() {
       })
     }
     return loaded.guesses
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showErrorAlert])
 
-  const [guesses, setGuesses] = useState<string[]>(() => processSavedGuesses())
+  const [guesses, setGuesses] = useState<string[]>(() =>
+    hash ? [] : processSavedGuesses()
+  )
 
   const [stats, setStats] = useState(() => loadStats())
 

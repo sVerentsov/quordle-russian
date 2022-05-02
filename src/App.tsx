@@ -100,6 +100,7 @@ function App() {
       })
     }
     return loaded.guesses
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showErrorAlert])
 
   const [guesses, setGuesses] = useState<string[]>(() => processSavedGuesses())

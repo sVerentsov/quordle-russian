@@ -1,6 +1,6 @@
 import { getGuessStatuses } from './statuses'
 import { unicodeSplit } from './words'
-import { GAME_TITLE } from '../constants/strings'
+import { GAME_TITLE, HOME_LINK } from '../constants/strings'
 import { MAX_CHALLENGES } from '../constants/settings'
 import { UAParser } from 'ua-parser-js'
 
@@ -21,7 +21,7 @@ export const shareStatus = (
   const textToShare =
     `${GAME_TITLE} ${solutionIndex} ${
       lost ? 'X' : guesses.length
-    }/${MAX_CHALLENGES}\n\n` +
+    }/${MAX_CHALLENGES}\n\n${HOME_LINK}\n\n` +
     generateEmojiGrid(
       solutions,
       guesses,
@@ -50,8 +50,14 @@ export const shareStatus = (
 const generateEmojiLine = (
   solution: string,
   guess: string,
-  tiles: string[]
+  tiles: string[],
+  skip: boolean
 ): string => {
+  if (skip) {
+    return unicodeSplit(guess)
+      .map((_) => tiles[3])
+      .join('')
+  }
   const status = getGuessStatuses(solution, guess)
   const splitGuess = unicodeSplit(guess)
 
@@ -74,20 +80,43 @@ export const generateEmojiGrid = (
   guesses: string[],
   tiles: string[]
 ) => {
+  const correctGuessInds = solutions.map((sol) =>
+    guesses.findIndex((g) => g === sol)
+  )
   const row1 = guesses
     .map(
-      (guess) =>
-        generateEmojiLine(solutions[0], guess, tiles) +
+      (guess, i) =>
+        generateEmojiLine(
+          solutions[0],
+          guess,
+          tiles,
+          correctGuessInds[0] > -1 && i > correctGuessInds[0]
+        ) +
         ' ' +
-        generateEmojiLine(solutions[1], guess, tiles)
+        generateEmojiLine(
+          solutions[2],
+          guess,
+          tiles,
+          correctGuessInds[2] > -1 && i > correctGuessInds[2]
+        )
     )
     .join('\n')
   const row2 = guesses
     .map(
-      (guess) =>
-        generateEmojiLine(solutions[2], guess, tiles) +
+      (guess, i) =>
+        generateEmojiLine(
+          solutions[1],
+          guess,
+          tiles,
+          correctGuessInds[1] > -1 && i > correctGuessInds[1]
+        ) +
         ' ' +
-        generateEmojiLine(solutions[3], guess, tiles)
+        generateEmojiLine(
+          solutions[3],
+          guess,
+          tiles,
+          correctGuessInds[3] > -1 && i > correctGuessInds[3]
+        )
     )
     .join('\n')
   return [row1, row2].join('\n\n')
@@ -109,5 +138,6 @@ const getEmojiTiles = (isDarkMode: boolean, isHighContrastMode: boolean) => {
   tiles.push(isHighContrastMode ? '🟧' : '🟩')
   tiles.push(isHighContrastMode ? '🟦' : '🟨')
   tiles.push(isDarkMode ? '⬛' : '⬜')
+  tiles.push(isDarkMode ? '▪️' : '▫️')
   return tiles
 }

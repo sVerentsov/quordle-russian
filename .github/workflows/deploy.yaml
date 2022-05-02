@@ -6,25 +6,23 @@ on:
 
 jobs:
   build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_KEY: ${{secrets.SSH_KEY}}
 
-runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+      - run: npm install
+      - run: npm run build
 
-env:
-  SSH_KEY: ${{secrets.SSH_KEY}}
+      - run: mkdir ~/.ssh
+      - run: 'echo "$SSH_KEY" >> ~/.ssh/github-action'
+      - run: chmod 400 ~/.ssh/github-action
+      - run: echo -e "Host static\n\tUser github-actions\n\tHostname ${{secrets.SSH_HOST}}\n\tPort ${{secrets.SSH_PORT}}\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
 
-steps:
-  - uses: actions/checkout@v2
-  - name: Use Node.js 16
-    uses: actions/setup-node@v3
-    with:
-      node-version: 16
-      cache: 'npm'
-  - run: npm install
-  - run: npm run build
-
-  - run: mkdir ~/.ssh
-  - run: 'echo "$SSH_KEY" >> ~/.ssh/github-action'
-  - run: chmod 400 ~/.ssh/github-action
-  - run: echo -e "Host static\n\tUser github-actions\n\tHostname ${{secrets.SSH_HOST}}\n\tPort ${{secrets.SSH_PORT}}\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
-
-  - run: rsync -e ssh build static:~/static/quordle
+      - run: rsync -e ssh build static:~/static/quordle

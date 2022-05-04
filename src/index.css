@@ -71,14 +71,20 @@ svg.cursor-pointer:hover {
 }
 
 .navbar-content {
-  display: flex;
+  display: grid;
   height: 3rem;
   align-items: center;
-  justify-content: space-between;
+  grid-template-columns: 1fr 1fr 1fr;
 }
 
 .right-icons {
   display: flex;
+  justify-self: end;
+  float: right;
+}
+
+.navbar-title {
+  justify-self: center;
 }
 
 @keyframes revealAbsentCharCell {

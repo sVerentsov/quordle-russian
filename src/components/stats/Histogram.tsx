@@ -25,19 +25,22 @@ export const Histogram = ({
 
   return (
     <div className="columns-1 justify-left m-2 text-sm dark:text-white">
-      {winDistribution.map((value, i) => (
-        <Progress
-          key={i}
-          index={i}
-          isCurrentDayStatRow={isCurrentDayStatRow(
-            isGameWon,
-            numberOfGuessesMade,
-            i
-          )}
-          size={90 * (value / maxValue)}
-          label={String(value)}
-        />
-      ))}
+      {winDistribution.map(
+        (value, i) =>
+          i >= 3 && ( // Don't show <=3 guesses
+            <Progress
+              key={i}
+              index={i}
+              isCurrentDayStatRow={isCurrentDayStatRow(
+                isGameWon,
+                numberOfGuessesMade,
+                i
+              )}
+              size={90 * (value / maxValue)}
+              label={String(value)}
+            />
+          )
+      )}
     </div>
   )
 }

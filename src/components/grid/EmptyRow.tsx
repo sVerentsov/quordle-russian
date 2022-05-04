@@ -9,7 +9,7 @@ export const EmptyRow = ({ hidden }: Props) => {
   const emptyCells = Array.from(Array(CHAR_COUNT))
 
   return (
-    <div className={`flex justify-center ${hidden ? 'hidden' : ''}`}>
+    <div className={`flex justify-center ${hidden ? 'invisible' : ''}`}>
       {emptyCells.map((_, i) => (
         <Cell key={i} />
       ))}

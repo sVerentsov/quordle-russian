@@ -21,7 +21,7 @@ export const CurrentRow = ({
   const splitGuess = unicodeSplit(guess)
   const emptyCells = Array.from(Array(CHAR_COUNT - splitGuess.length))
   const classes = `flex justify-center text-3xl ${
-    hidden ? 'hidden' : ''
+    hidden ? 'invisible' : ''
   } ${className}`
   const statuses =
     guess.length === CHAR_COUNT && isRevealing

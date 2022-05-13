@@ -5,14 +5,15 @@ import { unicodeSplit } from '../../lib/words'
 type Props = {
   solution: string
   guess: string
+  hidden: boolean
 }
 
-export const CompletedRow = ({ solution, guess }: Props) => {
+export const CompletedRow = ({ solution, guess, hidden }: Props) => {
   const statuses = getGuessStatuses(solution, guess)
   const splitGuess = unicodeSplit(guess)
 
   return (
-    <div className="flex justify-center text-xs">
+    <div className={`flex justify-center text-xs ${hidden ? 'invisible' : ''}`}>
       {splitGuess.map((letter, i) => (
         <Cell key={i} value={letter} status={statuses[i]} isCompleted />
       ))}

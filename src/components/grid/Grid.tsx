@@ -25,13 +25,13 @@ export const Grid = ({
 
   const correctGuessLocation = guesses.findIndex((guess) => guess === solution)
   const solved = correctGuessLocation > -1
-  let completedGuesses = guesses
-  if (solved) {
-    // if this grid is solved, ignore guesses after correct one.
-    completedGuesses = guesses.slice(0, correctGuessLocation + 1)
-  }
-  const completedRows = completedGuesses.map((guess, i) => (
-    <CompletedRow key={i} solution={solution} guess={guess} />
+  const completedRows = guesses.map((guess, i) => (
+    <CompletedRow
+      key={i}
+      solution={solution}
+      hidden={solved && i > correctGuessLocation}
+      guess={guess}
+    />
   ))
 
   return (
@@ -40,7 +40,7 @@ export const Grid = ({
       style={{
         gridTemplateRows:
           (guesses.length ? `repeat(${guesses.length}, auto) ` : '') +
-          '3rem' +
+          (guesses.length < MAX_CHALLENGES ? '3rem' : '') +
           (empties.length ? ` repeat(${empties.length}, auto)` : ''),
       }}
     >

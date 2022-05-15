@@ -328,6 +328,11 @@ function App() {
               resetPracticeGame()
               setIsStatsModalOpen(false)
             }}
+            onPracticeModeClick={() => {
+              setMode('practice')
+              resetPracticeGame()
+              setIsStatsModalOpen(false)
+            }}
             numberOfGuessesMade={guesses.length}
           />
           <SettingsModal

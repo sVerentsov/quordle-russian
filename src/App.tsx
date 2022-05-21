@@ -278,7 +278,7 @@ function App() {
     <SolutionContext.Provider
       value={{ ...dailySolutionsData, solutions, solutionIndex }}
     >
-      <div className="h-screen flex flex-col">
+      <div className="safe-h-screen flex flex-col">
         <Navbar
           setIsInfoModalOpen={setIsInfoModalOpen}
           setIsStatsModalOpen={setIsStatsModalOpen}
@@ -286,7 +286,7 @@ function App() {
           gameMode={mode}
           onModeChange={(mode) => setMode(mode)}
         />
-        <div className="pt-1 px-1 pb-1 w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow max-w-[550px] h-screen">
+        <div className="pt-1 px-1 pb-1 w-full mx-auto sm:px-6 lg:px-8 flex flex-col grow max-w-[550px] h-full">
           <div className="columns-2 h-full">
             {solutions.map((solution, i) => (
               <Grid
